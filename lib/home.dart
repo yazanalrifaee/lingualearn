@@ -19,7 +19,7 @@ class Home extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             const Text(
-              'Lingua Lear',
+              'Lingua Learn',
               style: TextStyle(
                 color: Color.fromRGBO(66, 203, 222, 1.0),
                 fontWeight: FontWeight.bold,
