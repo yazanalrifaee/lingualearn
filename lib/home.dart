@@ -27,8 +27,6 @@ class Home extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Adding ElevatedButton with text
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
