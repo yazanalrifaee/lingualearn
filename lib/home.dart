@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'page1.dart';
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
+
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  String selectedLanguage = 'Arabic';
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +34,57 @@ class Home extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
+            DropdownButton<String>(
+              value: selectedLanguage,
+              icon: const Icon(Icons.arrow_downward),
+              iconSize: 24,
+              elevation: 16,
+              style: const TextStyle(
+                color: Colors.deepPurple,
+                fontSize: 18.0,  // Adjust the font size as required
+              ),
+              underline: Container(  // This will remove the underline of the DropdownButton
+                height: 2,
+                color: const Color.fromRGBO(70, 194, 160, 1.0),
+              ),
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedLanguage = newValue!;
+                });
+              },
+              items: <String>[
+                'Arabic',
+                'Spanish',
+                'French',
+              ].map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        'assets/${value.split(' ')[0].toLowerCase()}.png',
+                        width: 30,
+                        height: 30,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        value,
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 18.0,  // Adjust the font size as required
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Page1()),
+                  MaterialPageRoute(builder: (context) => Page1(selectedLanguage: selectedLanguage)),
                 );
               },
               style: ElevatedButton.styleFrom(

@@ -4,7 +4,8 @@ import 'intermediate_page.dart';
 import 'advanced_page.dart';
 
 class Page1 extends StatelessWidget {
-  const Page1({Key? key}) : super(key: key);
+  final String selectedLanguage;
+  const Page1({Key? key, required  this.selectedLanguage}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +45,9 @@ class Page1 extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const BeginnerPage()),
+                        MaterialPageRoute(
+                          builder: (context) => BeginnerPage(selectedLanguage: selectedLanguage),
+                        ),
                       );
                     },
                   ),
@@ -56,7 +59,9 @@ class Page1 extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const IntermediatePage()),
+                        MaterialPageRoute(
+                          builder: (context) => IntermediatePage(selectedLanguage: selectedLanguage),
+                        ),
                       );
                     },
                   ),
@@ -68,7 +73,9 @@ class Page1 extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const AdvancedPage()),
+                        MaterialPageRoute(
+                          builder: (context) => AdvancedPage(selectedLanguage: selectedLanguage),
+                        ),
                       );
                     },
                   ),
