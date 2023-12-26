@@ -34,7 +34,7 @@ class _IntermediatePageState extends State<IntermediatePage> {
       List<dynamic> jsonResponse = json.decode(response.body);
       return jsonResponse.map((item) => item['word'] as String).toList();
     } else {
-      throw Exception('Failed to load intermediate word');
+      throw Exception('Failed to load intermediate words');
     }
   }
 
