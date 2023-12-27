@@ -18,14 +18,15 @@ final Map<String, String> languageCodes = {
 class BeginnerPage extends StatefulWidget {
   final String selectedLanguage;
 
-  const BeginnerPage({Key? key, required this.selectedLanguage}) : super(key: key);
+  const BeginnerPage({Key? key, required this.selectedLanguage})
+      : super(key: key);
 
   @override
   _BeginnerPageState createState() => _BeginnerPageState();
 }
 
 class _BeginnerPageState extends State<BeginnerPage> {
-  late Future<List<String>> beginnerWords;
+  late Future<List<Map<String, dynamic>>> beginnerWords;
   late FlutterTts flutterTts;
 
   @override
@@ -35,12 +36,18 @@ class _BeginnerPageState extends State<BeginnerPage> {
     flutterTts = FlutterTts();
   }
 
-  Future<List<String>> fetchBeginnerWords() async {
-    final response = await http.get(Uri.parse('https://llinguallearn.000webhostapp.com/getBeginner.php'));
+  Future<List<Map<String, dynamic>>> fetchBeginnerWords() async {
+    final response = await http.get(
+        Uri.parse('https://llinguallearn.000webhostapp.com/getBeginner.php'));
 
     if (response.statusCode == 200) {
       List<dynamic> jsonResponse = json.decode(response.body);
-      return jsonResponse.map((item) => item['word'] as String).toList();
+      return jsonResponse
+          .map((item) => {
+                'word': item['word'] as String,
+                'emoji': item['emoji'] as String,
+              })
+          .toList();
     } else {
       throw Exception('Failed to load beginner words');
     }
@@ -48,7 +55,8 @@ class _BeginnerPageState extends State<BeginnerPage> {
 
   Future<String> fetchTranslation(String word) async {
     String languageCode = languageCodes[widget.selectedLanguage] ?? 'ar';
-    final response = await http.get(Uri.parse('https://api.mymemory.translated.net/get?q=$word&langpair=en|$languageCode'));
+    final response = await http.get(Uri.parse(
+        'https://api.mymemory.translated.net/get?q=$word&langpair=en|$languageCode'));
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
@@ -75,7 +83,7 @@ class _BeginnerPageState extends State<BeginnerPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<List<String>>(
+        child: FutureBuilder<List<Map<String, dynamic>>>(
           future: beginnerWords,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -96,12 +104,12 @@ class _BeginnerPageState extends State<BeginnerPage> {
                   ),
                   const SizedBox(height: 20),
                   ...snapshot.data!
-                      .map((word) => FutureWordTile(
-                    word: word,
-                    icon: Icons.help,
-                    fetchTranslationCallback: fetchTranslation,
-                    playTranslatedWordCallback: playTranslatedWord,
-                  ))
+                      .map((element) => FutureWordTile(
+                            word: element['word'] as String,
+                            emoji: element['emoji'] as String,
+                            fetchTranslationCallback: fetchTranslation,
+                            playTranslatedWordCallback: playTranslatedWord,
+                          ))
                       .toList(),
                 ],
               );
@@ -115,14 +123,14 @@ class _BeginnerPageState extends State<BeginnerPage> {
 
 class FutureWordTile extends StatelessWidget {
   final String word;
-  final IconData icon;
+  final String emoji;
   final Future<String> Function(String) fetchTranslationCallback;
   final Function(String) playTranslatedWordCallback;
 
   const FutureWordTile({
     Key? key,
     required this.word,
-    required this.icon,
+    required this.emoji,
     required this.fetchTranslationCallback,
     required this.playTranslatedWordCallback,
   }) : super(key: key);
@@ -140,7 +148,7 @@ class FutureWordTile extends StatelessWidget {
           return WordTile(
             word: word,
             translation: snapshot.data ?? '',
-            icon: icon,
+            emoji: emoji,
             playTranslatedWordCallback: playTranslatedWordCallback,
           );
         }
@@ -152,14 +160,14 @@ class FutureWordTile extends StatelessWidget {
 class WordTile extends StatelessWidget {
   final String word;
   final String translation;
-  final IconData icon;
+  final String emoji;
   final Function(String) playTranslatedWordCallback;
 
   const WordTile({
     Key? key,
     required this.word,
     required this.translation,
-    required this.icon,
+    required this.emoji,
     required this.playTranslatedWordCallback,
   }) : super(key: key);
 
@@ -181,13 +189,14 @@ class WordTile extends StatelessWidget {
           );
         },
         child: Padding(
-          padding: const EdgeInsets.all(9.0),
+          padding: const EdgeInsets.all(3.0),
           child: Column(
             children: [
-              Icon(
-                icon,
-                size: 40.0,
-                color: const Color.fromRGBO(70, 194, 160, 1.0),
+              Text(
+                emoji,
+                style: const TextStyle(
+                  fontSize: 40.0,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
