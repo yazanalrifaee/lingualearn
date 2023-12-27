@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_tts/flutter_tts.dart';
 
 final Map<String, String> languageCodes = {
   'Arabic': 'ar',
   'Spanish': 'es',
   'French': 'fr',
+  'German': 'de',
+  'Chinese': 'zh',
+  'Italian': 'it',
+  'Russian': 'ru',
+  'Portuguese': 'pt',
+  'Japanese': 'ja'
 };
 
 class AdvancedPage extends StatefulWidget {
@@ -19,12 +26,14 @@ class AdvancedPage extends StatefulWidget {
 }
 
 class _advancedPageState extends State<AdvancedPage> {
-  late Future<List<String>> intermediateWords;
+  late Future<List<String>> advancedWords;
+  late FlutterTts flutterTts;
 
   @override
   void initState() {
     super.initState();
-    intermediateWords = fetchAdvancedWords();
+    advancedWords = fetchAdvancedWords();
+    flutterTts = FlutterTts();
   }
 
   Future<List<String>> fetchAdvancedWords() async {
@@ -51,6 +60,11 @@ class _advancedPageState extends State<AdvancedPage> {
       throw Exception('Failed to load translation');
     }
   }
+  void playTranslatedWord(String translatedText) async {
+    String languageCode = languageCodes[widget.selectedLanguage] ?? 'en';
+    await flutterTts.setLanguage(languageCode);
+    await flutterTts.speak(translatedText);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +81,7 @@ class _advancedPageState extends State<AdvancedPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder<List<String>>(
-          future: intermediateWords,
+          future: advancedWords,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressIndicator();
@@ -91,6 +105,7 @@ class _advancedPageState extends State<AdvancedPage> {
                             word: word,
                             icon: Icons.help,
                             fetchTranslationCallback: fetchTranslation,
+                    playTranslatedWordCallback: playTranslatedWord,
                           ))
                       .toList(),
                 ],
@@ -107,12 +122,14 @@ class FutureWordTile extends StatelessWidget {
   final String word;
   final IconData icon;
   final Future<String> Function(String) fetchTranslationCallback;
+  final Function(String) playTranslatedWordCallback;
 
   const FutureWordTile({
     Key? key,
     required this.word,
     required this.icon,
     required this.fetchTranslationCallback,
+    required this.playTranslatedWordCallback,
   }) : super(key: key);
 
   @override
@@ -126,7 +143,11 @@ class FutureWordTile extends StatelessWidget {
           return Text('Failed to fetch translation for $word');
         } else {
           return WordTile(
-              word: word, translation: snapshot.data ?? '', icon: icon);
+            word: word,
+            translation: snapshot.data ?? '',
+            icon: icon,
+            playTranslatedWordCallback: playTranslatedWordCallback,
+          );
         }
       },
     );
@@ -137,13 +158,15 @@ class WordTile extends StatelessWidget {
   final String word;
   final String translation;
   final IconData icon;
+  final Function(String) playTranslatedWordCallback;
 
-  const WordTile(
-      {Key? key,
-        required this.word,
-        required this.translation,
-        required this.icon})
-      : super(key: key);
+  const WordTile({
+    Key? key,
+    required this.word,
+    required this.translation,
+    required this.icon,
+    required this.playTranslatedWordCallback,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -151,11 +174,14 @@ class WordTile extends StatelessWidget {
       color: const Color.fromRGBO(226, 241, 246, 1.0),
       child: InkWell(
         onTap: () {
+          playTranslatedWordCallback(translation);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               backgroundColor: const Color.fromRGBO(70, 194, 160, 1.0),
-              content: Text('$word in your selected language: $translation',
-                  style: const TextStyle(color: Colors.white, fontSize: 16)),
+              content: Text(
+                '$word in your selected language: $translation',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
             ),
           );
         },

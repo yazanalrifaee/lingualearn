@@ -41,9 +41,9 @@ class _HomeState extends State<Home> {
               elevation: 16,
               style: const TextStyle(
                 color: Colors.deepPurple,
-                fontSize: 18.0,  // Adjust the font size as required
+                fontSize: 18.0,
               ),
-              underline: Container(  // This will remove the underline of the DropdownButton
+              underline: Container(
                 height: 2,
                 color: const Color.fromRGBO(70, 194, 160, 1.0),
               ),
@@ -56,6 +56,12 @@ class _HomeState extends State<Home> {
                 'Arabic',
                 'Spanish',
                 'French',
+                'German',
+                'Chinese',
+                'Italian',
+                'Russian',
+                'Portuguese',
+                'Japanese'
               ].map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -71,7 +77,7 @@ class _HomeState extends State<Home> {
                         value,
                         style: const TextStyle(
                           color: Colors.black87,
-                          fontSize: 18.0,  // Adjust the font size as required
+                          fontSize: 18.0,
                         ),
                       ),
                     ],
