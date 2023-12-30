@@ -90,7 +90,9 @@ class _advancedPageState extends State<AdvancedPage> {
           future: advancedWords,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
             } else if (snapshot.hasError) {
               return const Text('Failed to fetch advanced words');
             } else {
